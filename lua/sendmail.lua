@@ -289,7 +289,19 @@ local function CreateMail(from, to, smtp_server, message, options)
   if type(from)        == 'string' then  from        = { address = from }        end
   if type(to)          == 'string' then  to          = { address = to }          end
   if type(smtp_server) == 'string' then  smtp_server = { address = smtp_server } end
-  if type(message)     == 'string' then  message     = { text    = message }     end
+  if not message then  message = {}
+  elseif type(message) == 'string' then  message = { subject = message }
+  elseif message[1] then
+    message = clone(message)
+    if not message.subject then 
+      message[1], message.subject = nil, message[1]
+      if message[2] and not message.text then
+        message[2], message.text = nil, message[2]
+      end
+    elseif not message.text then
+      message[1], message.text = nil, message[1]
+    end
+  end
 
 
   -- Эти заголовки показываются только в почтовой программе и игнорируются smtp.send
