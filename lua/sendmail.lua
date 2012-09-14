@@ -45,6 +45,20 @@ local function append(dst, src)
   return dst
 end
 
+local ENCODERS = {
+  ['base64']           = function(msg) return mime.b64(msg) end,
+  ['quoted-printable'] = function(msg) return mime.qp (msg) end,
+}
+
+local function encoders(t)
+  if t == nil then
+    return ENCODERS['none']
+  end
+  local e = ENCODERS[t:lower()]
+  if not e then return nil, 'unknown encode type :' .. t end
+  return e
+end
+
 local function make_t_File (fileName)
   local src
   local name 
@@ -186,7 +200,7 @@ local function encode_title(title)
   end
 
   if title and #title > 0 then
-    local encoder, err = mime.encode(encode)
+    local encoder, err = encoders(encode)
     if not encode then return nil, err end
     local str = encoder(title)
     if str then return "=?" .. charset .. "?" .. encode:sub(1,1) .. "?" .. str .. "?=" end
