@@ -1,0 +1,88 @@
+---
+-- @module sendmail
+--
+
+--- Default charset
+DEFAULT_CHARSET = 'windows-1251'
+
+--- Default encoding
+DEFAULT_ENCODE  = 'base64'
+
+
+--- a table describe FROM header
+-- @tfield ?string title title used in header (or first value of table)
+-- @tfield string address email address
+-- @tfield ?string charset title charset
+-- @tfield ?string encode  ecoding used for title
+-- @table FROM
+
+--- a table describe TO headers
+-- @tfield ?string title title used in header (or first value of table)
+-- @tfield string|{string,...} address email address
+-- @tfield ?string charset title charset
+-- @tfield ?string encode  ecoding used for title
+-- @table TO
+
+--- a table describe smtp server
+-- @tfield string address
+-- @tfield string user
+-- @tfield string password
+-- @table SERVER
+
+--- a table describe message
+-- @tfield string|SUBJECT subject (or first value of table)
+-- @tfield ?string|TEXT text if no mime_type then 'text/plain' used (or second value of table)
+-- @tfield ?string|TEXT html if no mime_type then 'text/html' used
+-- @tfield ?string|FILE|{FILE,...} file  path, file or array of files
+-- @table MESSAGE
+-- @usage 
+--msg = {'this is subject'}
+--msg = {'this is subject';'this is text'}
+--msg = {subject = 'this is subject';'this is text'}
+--msg = {'this is subject';text='this is text'}
+--msg = {'subject', 'text', file = 'path/to/file'}
+
+
+--- a table describe subject
+-- @tfield string title subject's title (or first value of table)
+-- @tfield ?string charset title charset
+-- @tfield ?string encode ecoding used for title
+-- @table SUBJECT
+
+--- a table describe text part in message
+-- @tfield string data text data of message  (or first value of table)
+-- @tfield string  mime_type
+-- @tfield ?string charset
+-- @tfield ?string encode
+-- @tfield table headers
+-- @table TEXT
+
+--- a table describe attached file in message
+-- One of fields path, data, file are required.
+-- If no name and path is setted then name sets to basename of file.
+-- @tfield string name attachment's name
+-- @tfield ?string path surce file path
+-- @tfield ?string data content of attachment
+-- @tfield ?string file opened file handle (io.open in binary mode)
+-- @tfield ?string charset
+-- @tfield ?string encode
+-- @tfield ?string mime_type Default 'application/octet-stream'
+-- @tfield ?string disposition Default 'attachment'
+-- @tfield ?table headers
+-- @table FILE
+
+--- a table describe sendmail options
+-- @tfield boolean confirm_sending
+-- @table OPTIONS
+
+--- Send mail
+-- @tparam string|FROM from
+-- @tparam string|TO to
+-- @tparam string|SERVER smtp_server
+-- @tparam string|MESSAGE message
+-- @tparam ?OPTIONS options
+-- @treturn int|nil number of the sent messages
+-- @treturn string error message
+-- @usage 
+-- sendmail('me@host', 'to@host', 'host', {'test', 'hello'})
+function sendmail(from, to, smtp_server, message, options)end
