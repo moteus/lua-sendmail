@@ -25,6 +25,3 @@ build = {
     ["sendmail" ] = "lua/sendmail.lua",
   }
 }
-
-
-
