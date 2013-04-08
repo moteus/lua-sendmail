@@ -75,6 +75,14 @@ DEFAULT_ENCODE  = 'base64'
 -- @tfield boolean confirm_sending
 -- @table OPTIONS
 
+--- Send mail params as single table
+-- @tfield string|FROM from
+-- @tfield string|TO to
+-- @tfield string|SERVER server
+-- @tfield string|MESSAGE message
+-- @tfield ?OPTIONS options
+-- @table SEND_PARAMS
+
 --- Send mail
 -- @tparam string|FROM from
 -- @tparam string|TO to
@@ -86,3 +94,11 @@ DEFAULT_ENCODE  = 'base64'
 -- @usage 
 -- sendmail('me@host', 'to@host', 'host', {'test', 'hello'})
 function sendmail(from, to, smtp_server, message, options)end
+
+--- Send mail
+-- @tparam SEND_PARAMS params
+-- @treturn int|nil number of the sent messages
+-- @treturn string error message
+-- @usage 
+-- sendmail('me@host', 'to@host', 'host', {'test', 'hello'})
+function sendmail(params)end

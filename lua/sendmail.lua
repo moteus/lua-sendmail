@@ -368,7 +368,13 @@ local function CreateMail(from, to, smtp_server, message, options)
 end
 
 local function sendmail(...)
-  local msg, err = CreateMail(...)
+  local msg, err;
+  if type((...)) == 'table' and select('#', ...) == 1 then
+    local params = ...
+    msg, err = CreateMail(params.from, params.to, params.server, params.message, params.options)
+  else
+    msg, err = CreateMail(...)
+  end
   if not msg then return nil, err end
   return smtp.send(msg)
 end

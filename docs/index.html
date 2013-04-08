@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
     <title>Reference</title>
     <link rel="stylesheet" href="ldoc.css" type="text/css" />
@@ -46,18 +46,18 @@
 
 <h1>Module <code>sendmail</code></h1>
 
-<p>
-
-</p>
-<p>
-
-</p>
+<p></p>
+<p></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#sendmail">sendmail&nbsp;(from, to, smtp_server, message, options)</a></td>
+	<td class="summary">Send mail</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sendmail">sendmail&nbsp;(params)</a></td>
 	<td class="summary">Send mail</td>
 	</tr>
 </table>
@@ -96,6 +96,10 @@
 	<td class="name" nowrap><a href="#OPTIONS">OPTIONS</a></td>
 	<td class="summary">a table describe sendmail options</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#SEND_PARAMS">SEND_PARAMS</a></td>
+	<td class="summary">Send mail params as single table</td>
+	</tr>
 </table>
 <h2><a href="#Fields">Fields</a></h2>
 <table class="function_list">
@@ -114,7 +118,6 @@
 
 
     <h2><a name="Functions"></a>Functions</h2>
-
     <dl class="function">
     <dt>
     <a name = "sendmail"></a>
@@ -125,31 +128,21 @@
 
     <h3>Parameters:</h3>
     <ul>
-      <li><span class="parameter">from</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#FROM">FROM</a></span>
-
-
-</li>
-      <li><span class="parameter">to</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#TO">TO</a></span>
-
-
-</li>
-      <li><span class="parameter">smtp_server</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#SERVER">SERVER</a></span>
-
-
-</li>
-      <li><span class="parameter">message</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#MESSAGE">MESSAGE</a></span>
-
-
-</li>
-      <li><span class="parameter">options</span>
-        <span class="types">optional <a class="type" href="index.html#OPTIONS">OPTIONS</a></span>
-
-
-</li>
+        <li><span class="parameter">from</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#FROM">FROM</a></span>
+        </li>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#TO">TO</a></span>
+        </li>
+        <li><span class="parameter">smtp_server</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#SERVER">SERVER</a></span>
+        </li>
+        <li><span class="parameter">message</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#MESSAGE">MESSAGE</a></span>
+        </li>
+        <li><span class="parameter">options</span>
+            <span class="types">optional <a class="type" href="index.html#OPTIONS">OPTIONS</a></span>
+        </li>
     </ul>
 
     <h3>Returns:</h3>
@@ -166,13 +159,44 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">sendmail(&apos;me@host&apos;, &apos;to@host&apos;, &apos;host&apos;, {&apos;test&apos;, &apos;hello&apos;})</pre>
+        <pre class="example">sendmail(<span class="string">'me@host'</span>, <span class="string">'to@host'</span>, <span class="string">'host'</span>, {<span class="string">'test'</span>, <span class="string">'hello'</span>})</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "sendmail"></a>
+    <strong>sendmail&nbsp;(params)</strong>
+    </dt>
+    <dd>
+    Send mail
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">params</span>
+            <span class="types"><a class="type" href="index.html#SEND_PARAMS">SEND_PARAMS</a></span>
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+          <span class="types"><span class="type">int</span> or <span class="type">nil</span></span>
+        number of the sent messages</li>
+        <li>
+          <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sendmail(<span class="string">'me@host'</span>, <span class="string">'to@host'</span>, <span class="string">'host'</span>, {<span class="string">'test'</span>, <span class="string">'hello'</span>})</pre>
     </ul>
 
 </dd>
 </dl>
     <h2><a name="Tables"></a>Tables</h2>
-
     <dl class="function">
     <dt>
     <a name = "FROM"></a>
@@ -183,18 +207,18 @@
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">title</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       title used in header (or first value of table)</li>
-      <li><span class="parameter">address</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       email address</li>
-      <li><span class="parameter">charset</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       title charset</li>
-      <li><span class="parameter">encode</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        ecoding used for title</li>
+        <li><span class="parameter">title</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         title used in header (or first value of table)</li>
+        <li><span class="parameter">address</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         email address</li>
+        <li><span class="parameter">charset</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         title charset</li>
+        <li><span class="parameter">encode</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+          ecoding used for title</li>
     </ul>
 
 
@@ -211,18 +235,18 @@
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">title</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       title used in header (or first value of table)</li>
-      <li><span class="parameter">address</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <span class="type">{string,...}</span></span>
-       email address</li>
-      <li><span class="parameter">charset</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       title charset</li>
-      <li><span class="parameter">encode</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        ecoding used for title</li>
+        <li><span class="parameter">title</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         title used in header (or first value of table)</li>
+        <li><span class="parameter">address</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <span class="type">{string,...}</span></span>
+         email address</li>
+        <li><span class="parameter">charset</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         title charset</li>
+        <li><span class="parameter">encode</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+          ecoding used for title</li>
     </ul>
 
 
@@ -239,21 +263,15 @@
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">address</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
-      <li><span class="parameter">user</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
-      <li><span class="parameter">password</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
+        <li><span class="parameter">address</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
+        <li><span class="parameter">user</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
+        <li><span class="parameter">password</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
     </ul>
 
 
@@ -270,18 +288,18 @@
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">subject</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#SUBJECT">SUBJECT</a></span>
-       (or first value of table)</li>
-      <li><span class="parameter">text</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#TEXT">TEXT</a></span>
-       if no mime_type then 'text/plain' used (or second value of table)</li>
-      <li><span class="parameter">html</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#TEXT">TEXT</a></span>
-       if no mime_type then 'text/html' used</li>
-      <li><span class="parameter">file</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a>, <a class="type" href="index.html#FILE">FILE</a> or <span class="type">{FILE,...}</span></span>
-        path, file or array of files</li>
+        <li><span class="parameter">subject</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#SUBJECT">SUBJECT</a></span>
+         (or first value of table)</li>
+        <li><span class="parameter">text</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#TEXT">TEXT</a></span>
+         if no mime_type then 'text/plain' used (or second value of table)</li>
+        <li><span class="parameter">html</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#TEXT">TEXT</a></span>
+         if no mime_type then 'text/html' used</li>
+        <li><span class="parameter">file</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a>, <a class="type" href="index.html#FILE">FILE</a> or <span class="type">{FILE,...}</span></span>
+          path, file or array of files</li>
     </ul>
 
 
@@ -289,11 +307,12 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">msg = {&apos;this is subject&apos;}
-msg = {&apos;this is subject&apos;;&apos;this is text&apos;}
-msg = {subject = &apos;this is subject&apos;;&apos;this is text&apos;}
-msg = {&apos;this is subject&apos;;text=&apos;this is text&apos;}
-msg = {&apos;subject&apos;, &apos;text&apos;, file = &apos;path/to/file&apos;}</pre>
+        <pre class="example">
+msg = {<span class="string">'this is subject'</span>}
+msg = {<span class="string">'this is subject'</span>;<span class="string">'this is text'</span>}
+msg = {subject = <span class="string">'this is subject'</span>;<span class="string">'this is text'</span>}
+msg = {<span class="string">'this is subject'</span>;text=<span class="string">'this is text'</span>}
+msg = {<span class="string">'subject'</span>, <span class="string">'text'</span>, file = <span class="string">'path/to/file'</span>}</pre>
     </ul>
 
 </dd>
@@ -306,15 +325,15 @@ msg = {&apos;subject&apos;, &apos;text&apos;, file = &apos;path/to/file&apos;}</
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">title</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       subject's title (or first value of table)</li>
-      <li><span class="parameter">charset</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       title charset</li>
-      <li><span class="parameter">encode</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       ecoding used for title</li>
+        <li><span class="parameter">title</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         subject's title (or first value of table)</li>
+        <li><span class="parameter">charset</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         title charset</li>
+        <li><span class="parameter">encode</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         ecoding used for title</li>
     </ul>
 
 
@@ -331,29 +350,21 @@ msg = {&apos;subject&apos;, &apos;text&apos;, file = &apos;path/to/file&apos;}</
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">data</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       text data of message  (or first value of table)</li>
-      <li><span class="parameter">mime_type</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
-      <li><span class="parameter">charset</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
-      <li><span class="parameter">encode</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
-      <li><span class="parameter">headers</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
-
-
-</li>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         text data of message  (or first value of table)</li>
+        <li><span class="parameter">mime_type</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
+        <li><span class="parameter">charset</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
+        <li><span class="parameter">encode</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
+        <li><span class="parameter">headers</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+        </li>
     </ul>
 
 
@@ -372,39 +383,33 @@ msg = {&apos;subject&apos;, &apos;text&apos;, file = &apos;path/to/file&apos;}</
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">name</span>
-        <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       attachment's name</li>
-      <li><span class="parameter">path</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       surce file path</li>
-      <li><span class="parameter">data</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       content of attachment</li>
-      <li><span class="parameter">file</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       opened file handle (io.open in binary mode)</li>
-      <li><span class="parameter">charset</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
-      <li><span class="parameter">encode</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
-
-</li>
-      <li><span class="parameter">mime_type</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       Default 'application/octet-stream'</li>
-      <li><span class="parameter">disposition</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-       Default 'attachment'</li>
-      <li><span class="parameter">headers</span>
-        <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
-
-
-</li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         attachment's name</li>
+        <li><span class="parameter">path</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         surce file path</li>
+        <li><span class="parameter">data</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         content of attachment</li>
+        <li><span class="parameter">file</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         opened file handle (io.open in binary mode)</li>
+        <li><span class="parameter">charset</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
+        <li><span class="parameter">encode</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        </li>
+        <li><span class="parameter">mime_type</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         Default 'application/octet-stream'</li>
+        <li><span class="parameter">disposition</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         Default 'attachment'</li>
+        <li><span class="parameter">headers</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+        </li>
     </ul>
 
 
@@ -421,11 +426,40 @@ msg = {&apos;subject&apos;, &apos;text&apos;, file = &apos;path/to/file&apos;}</
 
     <h3>Fields:</h3>
     <ul>
-      <li><span class="parameter">confirm_sending</span>
-        <span class="types"><span class="type">boolean</span></span>
+        <li><span class="parameter">confirm_sending</span>
+            <span class="types"><span class="type">boolean</span></span>
+        </li>
+    </ul>
 
 
-</li>
+
+
+
+</dd>
+    <dt>
+    <a name = "SEND_PARAMS"></a>
+    <strong>SEND_PARAMS</strong>
+    </dt>
+    <dd>
+    Send mail params as single table
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">from</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#FROM">FROM</a></span>
+        </li>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#TO">TO</a></span>
+        </li>
+        <li><span class="parameter">server</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#SERVER">SERVER</a></span>
+        </li>
+        <li><span class="parameter">message</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="index.html#MESSAGE">MESSAGE</a></span>
+        </li>
+        <li><span class="parameter">options</span>
+            <span class="types">optional <a class="type" href="index.html#OPTIONS">OPTIONS</a></span>
+        </li>
     </ul>
 
 
@@ -435,7 +469,6 @@ msg = {&apos;subject&apos;, &apos;text&apos;, file = &apos;path/to/file&apos;}</
 </dd>
 </dl>
     <h2><a name="Fields"></a>Fields</h2>
-
     <dl class="function">
     <dt>
     <a name = "DEFAULT_CHARSET"></a>
