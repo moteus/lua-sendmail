@@ -1,7 +1,8 @@
 lua-sendmail
 ============
 
-Simple wrapper around luasoket smtp.send
+Simple wrapper around luasoket smtp.send.<br/>
+See [documentation](http://moteus.github.io/sendmail/index.html).
 
 ##Dependences##
 * [LuaSocket](http://www.impa.br/~diego/software/luasocket)
