@@ -11,7 +11,7 @@ local from, to, server = 'from@some.mail', 'to@some.mail', '127.0.0.1'
 
 sendmail(from, to, server, {"Subject", [[
   This is mail body.
-]]
+]],
   file = {
     name = 'message.txt';
     data = 'file content';
