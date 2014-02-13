@@ -1,8 +1,8 @@
 package = "sendmail"
-version = "scm-0"
+version = "0.1.1-1"
 source = {
-  url = "https://github.com/moteus/lua-sendmail/archive/master.zip",
-  dir = "lua-sendmail-master",
+  url = "https://github.com/moteus/lua-sendmail/archive/v0.1.1.zip",
+  dir = "lua-sendmail-0.1.1",
 }
 
 description = {
