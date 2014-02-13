@@ -1,0 +1,13 @@
+name = "sendmail"
+version = "0.1.1"
+
+desc = "Simple wrapper around luasoket smtp.send"
+author = "Alexey Melnichuk"
+license = "MIT/X11"
+url = "https://github.com/moteus/lua-sendmail"
+maintainer = "Alexey Melnichuk"
+
+depends = {
+  "lua >= 5.1",
+  "luasocket >= 2.0"
+}
