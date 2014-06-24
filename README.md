@@ -1,5 +1,6 @@
 lua-sendmail
 ============
+[![Licence](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENCE.txt)
 
 Simple wrapper around luasoket smtp.send.<br/>
 See [documentation](http://moteus.github.io/sendmail/index.html).
