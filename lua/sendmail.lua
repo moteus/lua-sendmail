@@ -330,8 +330,7 @@ local function CreateMail(from, to, smtp_server, message, options)
     end
   end
 
-
-  -- Эти заголовки показываются только в почтовой программе и игнорируются smtp.send
+  -- This headers uses only by mail clients. smtp.send ignores them.
   local headers = clone(DEFAULT_HEADERS)
 
   headers['from'] = make_from(from)
