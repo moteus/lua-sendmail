@@ -226,7 +226,7 @@ local function encode_title(title)
 
   if title and #title > 0 then
     local encoder, err = encoders(encode)
-    if not encode then return nil, err end
+    if not encoder then return nil, err end
     local str = encoder(title)
     if str then return "=?" .. charset .. "?" .. encode:sub(1,1) .. "?" .. str .. "?=" end
     return title
@@ -333,9 +333,12 @@ local function CreateMail(from, to, smtp_server, message, options)
   -- This headers uses only by mail clients. smtp.send ignores them.
   local headers = clone(DEFAULT_HEADERS)
 
-  headers['from'] = make_from(from)
+  local err
+  headers['from'], err  = make_from(from)
+  if not headers['from'] then return nil, err end
 
-  headers['to'] = encode_title(to)
+  headers['to'], err = encode_title(to)
+  if not headers['to'] then return nil, err end
 
   to = make_t_to(to, options)
   if (not to and not to[1]) then return nil, 'unknown recipient' end
@@ -351,7 +354,10 @@ local function CreateMail(from, to, smtp_server, message, options)
       headers = append(clone(message.headers), headers)
     end
 
-    headers.subject = encode_title(message.subject)
+    headers.subject, err = encode_title(message.subject)
+    if not headers.subject then
+      return nil, err
+    end
 
     local body, err = make_t_Body(message)
     if not body then return nil, err end
