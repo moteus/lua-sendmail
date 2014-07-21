@@ -205,7 +205,7 @@ local function make_t_to(to,options)
   end
 
   for _,addr in ipairs(address) do 
-    local addr = "<" .. addr .. ">"
+    addr = "<" .. addr .. ">"
     if options.confirm_sending then
       addr = addr .. " NOTIFY=SUCCESS,FAILURE"
     end
@@ -219,7 +219,7 @@ local function encode_title(title)
   local encode  = DEFAULT_ENCODE
 
   if type(title) == 'table' then
-    charset = title.charset or charset
+    charset  = title.charset or charset
     encode   = title.encode or encode
     title    = title[1] or title.title
   end
@@ -335,9 +335,11 @@ local function CreateMail(from, to, smtp_server, message, options)
 
   headers['from'] = make_from(from)
 
-  local to = make_t_to(to, options)
+  headers['to'] = encode_title(to)
+
+  to = make_t_to(to, options)
   if (not to and not to[1]) then return nil, 'unknown recipient' end
-  headers['to'] = encode_title(to) .. (to[1]:match('%b<>') or '')
+  headers['to'] = headers['to'] .. (to[1]:match('%b<>') or '')
 
   if options.confirm_sending then
     headers['Return-Receipt-To']="<" .. (from.address or '') .. ">"
