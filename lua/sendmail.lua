@@ -368,8 +368,10 @@ local function CreateMail(from, to, smtp_server, message, options)
     from     = from.address and "<" .. from.address .. ">" or '',
     rcpt     = to,
     server   = smtp_server.address,
+    port     = smtp_server.port,
     user     = smtp_server.user,
     password = smtp_server.password,
+    create   = smtp_server.create,
     source   = smtp.message(source)
   }
 end
