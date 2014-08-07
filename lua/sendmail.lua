@@ -114,13 +114,13 @@ local function make_t_File (fileName)
     mime_type   = fileName.mime_type   or mime_type
     disposition = fileName.disposition or disposition
     encode      = fileName.encode      or encode
-    if fileName.headers then headers = clone(fileName.headers) end
+    if fileName.headers then append(headers, fileName.headers) end
   end
 
   assert(src)
   assert(name)
   local encoder, err = mime.encode(encode)
-  if not encode then return nil, err end
+  if not encoder then return nil, err end
 
   return {
     headers = append(headers, {
@@ -140,7 +140,7 @@ local function make_t_Text(data, mime_type, charset, encode)
     charset   = data.charset   or charset
     encode    = data.encode    or encode
     mime_type = data.mime_type or mime_type
-    if data.headers then headers = clone(data.headers) end
+    if data.headers then append(headers, data.headers) end
     data      = data[1]        or data.data
   end
 
@@ -150,7 +150,7 @@ local function make_t_Text(data, mime_type, charset, encode)
   if encode:lower() == '8bit' then src = mime.eol(0, data)
   else
     local encoder, err = mime.encode(encode)
-    if not encode then return nil, err end
+    if not encoder then return nil, err end
     src = ltn12.source.chain(ltn12.source.string(data),
       ltn12.filter.chain(encoder,mime.wrap(encode))
     )
