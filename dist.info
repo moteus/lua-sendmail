@@ -1,5 +1,5 @@
 name = "sendmail"
-version = "0.1.1"
+version = "0.1.2"
 
 desc = "Simple wrapper around luasoket smtp.send"
 author = "Alexey Melnichuk"
