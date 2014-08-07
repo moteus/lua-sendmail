@@ -20,6 +20,17 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+------------------------------------------------------------
+local DEFAULT_CHARSET = 'windows-1251'
+local DEFAULT_ENCODE  = 'base64'
+local DEFAULT_HEADERS = {
+  ['x-mailer'] = 'Cool mailer'
+}
+local DEFAULT_OPTIONS = {
+  confirm_sending = false;
+}
+------------------------------------------------------------
+
 local smtp   = require("socket.smtp")
 local socket = require("socket")
 local ltn12  = require("ltn12")
@@ -48,26 +59,15 @@ local function split(text, sep, plain)
   return res
 end
 
-local DEFAULT_CHARSET = 'windows-1251'
-local DEFAULT_ENCODE  = 'base64'
-local DEFAULT_HEADERS = {
-  ['x-mailer'] = 'Cool mailer'
-}
-local DEFAULT_OPTIONS = {
-  confirm_sending = false;
-}
-
-local function clone(t)
-  local o = {}
-  for k, v in pairs(t) do o[k] = v end
-  return o
-end
-
 local function append(dst, src)
   for k,v in pairs(src) do 
     dst[k] = v
   end
   return dst
+end
+
+local function clone(t)
+  return append({}, t)
 end
 
 local ENCODERS = {
