@@ -301,7 +301,12 @@ local function has(t,k)
 end
 
 luasec_create = function(params)
-  local params     = clone(params)
+  assert(params)
+
+  if params == true then params = {} 
+  elseif type(params) == 'string' then params = {protocol = params}
+  else params = clone(params) end
+
   params.mode      = params.mode     or "client"
   params.protocol  = params.protocol or "tlsv1"
   params.verify    = params.verify   or {"peer", "fail_if_no_peer_cert"}

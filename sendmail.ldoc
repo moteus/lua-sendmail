@@ -25,10 +25,10 @@ DEFAULT_ENCODE  = 'base64'
 
 --- a table describe smtp server.
 -- @tfield string address
--- @tfield number|string port (default 25 and 465 if tou set `ssl` options)
+-- @tfield number|string port (default 25 and 465 if you set `ssl` options)
 -- @tfield string user
 -- @tfield string password
--- @tfield SSL ssl securety options (required `LuaSec` module)
+-- @tfield SSL|boolean|string ssl securety options. `true` mean use default options. Also you can pass protocol name as string. (required `LuaSec` module)
 -- @tfield function create constructor for creating socket
 -- @table SERVER
 
