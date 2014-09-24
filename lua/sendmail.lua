@@ -1,4 +1,4 @@
--- sendmail.lua v0.1.2 (2014-08)
+-- sendmail.lua v0.1.3-dev (2014-08)
 
 -- Copyright (c) 2013-2014 Alexey Melnichuk
 --
@@ -43,16 +43,15 @@ local function basename(f)
   return (string.match(f, "[^\\/]+$"))
 end
 
-local function split(text, sep, plain)
-  local res={}
-  local searchPos=1
-  while true do
-    local matchStart, matchEnd=string.find(text, sep, searchPos, plain)
-    if matchStart and matchEnd >= matchStart then
-      table.insert(res, string.sub(text, searchPos, matchStart-1))
-      searchPos=matchEnd+1
+local function split(str, sep, plain)
+  local b, res = 1, {}
+  while b <= #str do
+    local e, e2 = string.find(str, sep, b, plain)
+    if e then
+      res[#res + 1] = string.sub(str, b, e-1)
+      b = e2 + 1
     else
-      table.insert(res, string.sub(text, searchPos))
+      res[#res + 1] = string.sub(str, b)
       break
     end
   end
@@ -68,6 +67,12 @@ end
 
 local function clone(t)
   return append({}, t)
+end
+
+local function prequire(name)
+  local ok, mod = pcall(require, name)
+  if not ok then return nil, mod end
+  return mod, name
 end
 
 local ENCODERS = {
@@ -241,6 +246,107 @@ local function make_from(t)
   return str 
 end
 
+local luasec_create do local ssl = prequire "ssl" if ssl then
+
+-- based on  http://curl.haxx.se/docs/sslcerts.html
+
+local DEFAULT_CA_NAME = "curl-ca-bundle.crt"
+
+local function find_ca_by_env()
+  local env = setmetatable({},{__index = function(_, name) return os.getenv(name) end})
+
+  if env.SSL_CERT_DIR then return nil, env.SSL_CERT_DIR end
+
+  if env.SSL_CERT_FILE then return env.SSL_CERT_FILE  end
+end
+
+local function find_ca_by_fs(name)
+  local path = prequire "path"
+  if not (path and path.IS_WINDOWS) then return name end
+
+  if name then
+    if path.isfile(name)        then return name end
+    if path.dirname(name) ~= "" then return name end
+  else name = DEFAULT_CA_NAME end
+
+  local env = setmetatable({},{__index = function(_, name) return os.getenv(name) end})
+
+  local paths = {
+    '.',
+    path.join(env.windir, "System32"),
+    path.join(env.windir, "SysWOW64"),
+    env.windir,
+  }
+  for _, p in ipairs(split(env.path, ';', true)) do paths[#paths + 1] = p end
+
+  for _, p in ipairs(paths) do
+    p = path.fullpath(p)
+    if path.isdir(p) then
+      p = path.join(p, name)
+      if path.isfile(p) then
+        return p
+      end
+    end
+  end
+end
+
+local function has(t,k)
+  if type(t) == "table" then
+    for _, v in ipairs(t) do
+      if k == v then return true end
+    end
+    return false
+  end
+  return t == k
+end
+
+luasec_create = function(params)
+  local params     = clone(params)
+  params.mode      = params.mode     or "client"
+  params.protocol  = params.protocol or "tlsv1"
+  params.verify    = params.verify   or {"peer", "fail_if_no_peer_cert"}
+  params.options   = params.options  or {"all"}
+
+  assert(params.mode == "client")
+
+  if not has(params.verify, "none") then repeat
+    if params.cafile or params.capath then
+      if params.cafile then
+        params.cafile = find_ca_by_fs(params.cafile) or params.cafile
+      end
+    break end
+
+    local cafile, capath = find_ca_by_env()
+    if cafile or capath then
+      params.cafile, params.capath = cafile, capath
+      break
+    end
+    params.cafile = find_ca_by_fs()
+  until true end
+
+  return function()
+
+    local sock = socket.tcp()
+
+    return setmetatable({
+        connect = function(_, host, port)
+            local r, e = sock:connect(host, port)
+            if not r then return r, e end
+            sock = ssl.wrap(sock, params)
+            return sock:dohandshake()
+        end
+    }, {
+        __index = function(t,n)
+            return function(_, ...)
+                return sock[n](sock, ...)
+            end
+        end
+    })
+  end
+end
+
+end end
+
 --------------------------------------------------------
 -- make message for smtp.send
 --[[!---------------------------------------------------
@@ -312,6 +418,17 @@ end
 }
 --!]]
 local function CreateMail(from, to, smtp_server, message, options)
+
+  local smtp_port = smtp_server.port
+
+  local create_socket = smtp_server.create
+  if not create_socket and smtp_server.ssl then
+    if not luasec_create then return nil, "SSL not supported" end
+    create_socket, err = luasec_create(smtp_server.ssl)
+    if not create_socket then return nil, err end
+    smtp_port = smtp_server.port or 465
+  end
+
   options = options or DEFAULT_OPTIONS 
   if type(from)        == 'string' then  from        = { address = from }        end
   if type(to)          == 'string' then  to          = { address = to }          end
@@ -368,10 +485,10 @@ local function CreateMail(from, to, smtp_server, message, options)
     from     = from.address and "<" .. from.address .. ">" or '',
     rcpt     = to,
     server   = smtp_server.address,
-    port     = smtp_server.port,
+    port     = smtp_port,
     user     = smtp_server.user,
     password = smtp_server.password,
-    create   = smtp_server.create,
+    create   = create_socket,
     source   = smtp.message(source)
   }
 end

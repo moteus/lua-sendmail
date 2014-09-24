@@ -25,11 +25,29 @@ DEFAULT_ENCODE  = 'base64'
 
 --- a table describe smtp server.
 -- @tfield string address
--- @tfield number|string port
+-- @tfield number|string port (default 25 and 465 if tou set `ssl` options)
 -- @tfield string user
 -- @tfield string password
+-- @tfield SSL ssl securety options (required `LuaSec` module)
 -- @tfield function create constructor for creating socket
 -- @table SERVER
+
+--- a table describe SSL securety options.
+-- For more information see documentation for `LuaSec` module.
+-- </br>Library use similar mechanism to find CA file as in cURL library.
+-- </br>Library use environment variables to find CA file.
+-- </br>On Windows library also search in system directory. (required `lua-path` module)
+-- </br>For more information see <a href=http://curl.haxx.se/docs/sslcerts.html>SSL Certificate Verification</a>
+-- for cURL library.
+--
+-- @tfield ?string|table protocol (default "tlsv1")
+-- @tfield ?string|table verify   (default {"peer", "fail_if_no_peer_cert"})
+-- @tfield ?string|table options  (default {"all"})
+-- @tfield ?string cafile
+-- @tfield ?string capath
+-- @table SSL
+-- @usage 
+-- ssl = {verify = "none"} -- ignore sert
 
 --- a table describe message.
 -- @tfield string|SUBJECT subject (or first value of table)
