@@ -38,6 +38,8 @@ local mime   = require("mime")
 local string = require("string")
 local table  = require("table")
 local io     = require("io")
+local ssl    = require("ssl")
+
 
 local function basename(f)
   return (string.match(f, "[^\\/]+$"))
@@ -241,6 +243,24 @@ local function make_from(t)
   return str 
 end
 
+local function ssl_create()
+    local sock = socket.tcp()
+    return setmetatable({
+        connect = function(_, host, port)
+            local r, e = sock:connect(host, port)
+            if not r then return r, e end
+            sock = ssl.wrap(sock, {mode='client', protocol='tlsv1'})
+            return sock:dohandshake()
+        end
+    }, {
+        __index = function(t,n)
+            return function(_, ...)
+                return sock[n](sock, ...)
+            end
+        end
+    })
+end
+
 --------------------------------------------------------
 -- make message for smtp.send
 --[[!---------------------------------------------------
@@ -368,10 +388,10 @@ local function CreateMail(from, to, smtp_server, message, options)
     from     = from.address and "<" .. from.address .. ">" or '',
     rcpt     = to,
     server   = smtp_server.address,
-    port     = smtp_server.port,
+    port     = smtp_server.port or 465,
     user     = smtp_server.user,
     password = smtp_server.password,
-    create   = smtp_server.create,
+    create   = smtp_server.create or ssl_create,
     source   = smtp.message(source)
   }
 end

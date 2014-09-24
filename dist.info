@@ -1,5 +1,5 @@
 name = "sendmail"
-version = "0.1.2"
+version = "0.1.3"
 
 desc = "Simple wrapper around luasoket smtp.send"
 author = "Alexey Melnichuk"
@@ -9,5 +9,6 @@ maintainer = "Alexey Melnichuk"
 
 depends = {
   "lua >= 5.1",
-  "luasocket >= 2.0"
+  "luasocket >= 2.0",
+  "luasec >= 0.5"
 }
