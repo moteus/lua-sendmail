@@ -75,6 +75,10 @@
 	<td class="summary">a table describe smtp server.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#SSL">SSL</a></td>
+	<td class="summary">a table describe SSL securety options.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#MESSAGE">MESSAGE</a></td>
 	<td class="summary">a table describe message.</td>
 	</tr>
@@ -286,7 +290,7 @@
         </li>
         <li><span class="parameter">port</span>
             <span class="types"><span class="type">number</span> or <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-
+         (default 25 and 465 if you set `ssl` options)
         </li>
         <li><span class="parameter">user</span>
             <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
@@ -295,6 +299,10 @@
         <li><span class="parameter">password</span>
             <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
 
+        </li>
+        <li><span class="parameter">ssl</span>
+            <span class="types"><a class="type" href="index.html#SSL">SSL</a>, <span class="type">boolean</span> or <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         securety options. `true` mean use default options. Also you can pass protocol name as string. (required `LuaSec` module)
         </li>
         <li><span class="parameter">create</span>
             <span class="types"><span class="type">function</span></span>
@@ -305,6 +313,54 @@
 
 
 
+
+</dd>
+    <dt>
+    <a name = "SSL"></a>
+    <strong>SSL</strong>
+    </dt>
+    <dd>
+    a table describe SSL securety options.
+ For more information see documentation for `LuaSec` module.
+ </br>Library use similar mechanism to find CA file as in cURL library.
+ </br>Library use environment variables to find CA file.
+ </br>On Windows library also search in system directory. (required `lua-path` module)
+ </br>For more information see <a href=http://curl.haxx.se/docs/sslcerts.html>SSL Certificate Verification</a>
+ for cURL library.
+
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">protocol</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         (default "tlsv1")
+        </li>
+        <li><span class="parameter">verify</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+           (default {"peer", "fail_if_no_peer_cert"})
+        </li>
+        <li><span class="parameter">options</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+          (default {"all"})
+        </li>
+        <li><span class="parameter">cafile</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+
+        </li>
+        <li><span class="parameter">capath</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">ssl = {verify = <span class="string">"none"</span>} -- ignore sert</pre>
+    </ul>
 
 </dd>
     <dt>
