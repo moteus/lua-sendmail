@@ -1,4 +1,4 @@
--- sendmail.lua v0.1.3-dev (2014-08)
+-- sendmail.lua v0.1.3-dev (2014-09)
 
 -- Copyright (c) 2013-2014 Alexey Melnichuk
 --
@@ -280,12 +280,9 @@ local function find_ca_by_fs(name)
   for _, p in ipairs(split(env.path, ';', true)) do paths[#paths + 1] = p end
 
   for _, p in ipairs(paths) do
-    p = path.fullpath(p)
-    if path.isdir(p) then
-      p = path.join(p, name)
-      if path.isfile(p) then
-        return p
-      end
+    p = path.join(path.fullpath(p), name)
+    if path.isfile(p) then
+      return p
     end
   end
 end
@@ -310,7 +307,7 @@ luasec_create = function(params)
   params.mode      = params.mode     or "client"
   params.protocol  = params.protocol or "tlsv1"
   params.verify    = params.verify   or {"peer", "fail_if_no_peer_cert"}
-  params.options   = params.options  or {"all"}
+  params.options   = params.options  or "all"
 
   assert(params.mode == "client")
 
@@ -319,13 +316,15 @@ luasec_create = function(params)
       if params.cafile then
         params.cafile = find_ca_by_fs(params.cafile) or params.cafile
       end
-    break end
+      break
+    end
 
     local cafile, capath = find_ca_by_env()
     if cafile or capath then
       params.cafile, params.capath = cafile, capath
       break
     end
+
     params.cafile = find_ca_by_fs()
   until true end
 
@@ -334,18 +333,20 @@ luasec_create = function(params)
     local sock = socket.tcp()
 
     return setmetatable({
-        connect = function(_, host, port)
-            local r, e = sock:connect(host, port)
-            if not r then return r, e end
-            sock = ssl.wrap(sock, params)
-            return sock:dohandshake()
-        end
+      connect = function(_, host, port)
+        local r, e = sock:connect(host, port)
+        if not r then return r, e end
+        sock = ssl.wrap(sock, params)
+        return sock:dohandshake()
+      end
     }, {
-        __index = function(t,n)
-            return function(_, ...)
-                return sock[n](sock, ...)
-            end
+      __index = function(t,n)
+        local fn = function(_, ...)
+          return sock[n](sock, ...)
         end
+        t[n] = fn
+        return fn
+      end
     })
   end
 end
