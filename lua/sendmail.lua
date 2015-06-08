@@ -1,4 +1,4 @@
--- sendmail.lua v0.1.3 (2014-09)
+-- sendmail.lua v0.1.3-dev (2014-09)
 
 -- Copyright (c) 2013-2014 Alexey Melnichuk
 --
@@ -89,6 +89,27 @@ local function encoders(t)
   return e
 end
 
+local function encode_title(title)
+  local charset = DEFAULT_CHARSET
+  local encode  = DEFAULT_ENCODE
+
+  if type(title) == 'table' then
+    charset  = title.charset or charset
+    encode   = title.encode or encode
+    title    = title[1] or title.title
+  end
+
+  if title and #title > 0 then
+    local encoder, err = encoders(encode)
+    if not encoder then return nil, err end
+    local str = encoder(title)
+    if str then return "=?" .. charset .. "?" .. encode:sub(1,1) .. "?" .. str .. "?=" end
+    return title
+  else 
+    return ""
+  end
+end
+
 local function make_t_File (fileName)
   local src
   local name 
@@ -121,6 +142,8 @@ local function make_t_File (fileName)
     encode      = fileName.encode      or encode
     if fileName.headers then append(headers, fileName.headers) end
   end
+
+  name = encode_title(name)
 
   assert(src)
   assert(name)
@@ -217,27 +240,6 @@ local function make_t_to(to,options)
     table.insert(to_,addr)
   end
   return to_
-end
-
-local function encode_title(title)
-  local charset = DEFAULT_CHARSET
-  local encode  = DEFAULT_ENCODE
-
-  if type(title) == 'table' then
-    charset  = title.charset or charset
-    encode   = title.encode or encode
-    title    = title[1] or title.title
-  end
-
-  if title and #title > 0 then
-    local encoder, err = encoders(encode)
-    if not encoder then return nil, err end
-    local str = encoder(title)
-    if str then return "=?" .. charset .. "?" .. encode:sub(1,1) .. "?" .. str .. "?=" end
-    return title
-  else 
-    return ""
-  end
 end
 
 local function make_from(t)
@@ -430,7 +432,7 @@ local function CreateMail(from, to, smtp_server, message, options)
   local create_socket = smtp_server.create
   if not create_socket and smtp_server.ssl then
     if not luasec_create then return nil, "SSL not supported" end
-    create_socket, err = luasec_create(smtp_server.ssl)
+    local err create_socket, err = luasec_create(smtp_server.ssl)
     if not create_socket then return nil, err end
     smtp_port = smtp_server.port or 465
   end
