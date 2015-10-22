@@ -430,11 +430,19 @@ local function CreateMail(from, to, smtp_server, message, options)
   local smtp_port = smtp_server.port
 
   local create_socket = smtp_server.create
-  if not create_socket and smtp_server.ssl then
-    if not luasec_create then return nil, "SSL not supported" end
-    local err create_socket, err = luasec_create(smtp_server.ssl)
-    if not create_socket then return nil, err end
-    smtp_port = smtp_server.port or 465
+  if smtp_server.ssl then
+    smtp_port = smtp_port or 465
+
+    if not create_socket then
+      if not luasec_create then return nil, "SSL not supported" end
+      local err create_socket, err = luasec_create(smtp_server.ssl)
+      if not create_socket then return nil, err end
+    else
+      local base_create_socket = create_socket
+      create_socket = function()
+        return base_create_socket(smtp_server.ssl)
+      end;
+    end
   end
 
   options = options or DEFAULT_OPTIONS 
