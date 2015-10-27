@@ -28,8 +28,9 @@ DEFAULT_ENCODE  = 'base64'
 -- @tfield number|string port (default 25 and 465 if you set `ssl` options)
 -- @tfield string user
 -- @tfield string password
--- @tfield SSL|boolean|string ssl securety options. `true` mean use default options. Also you can pass protocol name as string. (required `LuaSec` module)
--- @tfield function create constructor for creating socket
+-- @tfield SSL|boolean|string|opaque ssl securety options. `true` mean use default options. Also you can pass protocol name as string. (required `LuaSec` module).
+--  opaque value used with custom `create` function.
+-- @tfield function create constructor for creating socket. If `ssl` option is provided then it pass to `create` function without any changes.
 -- @table SERVER
 
 --- a table describe SSL securety options.

@@ -1,6 +1,6 @@
--- sendmail.lua v0.1.3-dev (2014-09)
+-- sendmail.lua v0.1.4 (2015-10)
 
--- Copyright (c) 2013-2014 Alexey Melnichuk
+-- Copyright (c) 2013-2015 Alexey Melnichuk
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal

@@ -301,12 +301,13 @@
 
         </li>
         <li><span class="parameter">ssl</span>
-            <span class="types"><a class="type" href="index.html#SSL">SSL</a>, <span class="type">boolean</span> or <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         securety options. `true` mean use default options. Also you can pass protocol name as string. (required `LuaSec` module)
+            <span class="types"><a class="type" href="index.html#SSL">SSL</a>, <span class="type">boolean</span>, <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <span class="type">opaque</span></span>
+         securety options. `true` mean use default options. Also you can pass protocol name as string. (required `LuaSec` module).
+  opaque value used with custom `create` function.
         </li>
         <li><span class="parameter">create</span>
             <span class="types"><span class="type">function</span></span>
-         constructor for creating socket
+         constructor for creating socket. If `ssl` option is provided then it pass to `create` function without any changes.
         </li>
     </ul>
 
