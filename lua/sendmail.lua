@@ -128,15 +128,21 @@ local function make_t_File (fileName)
     local path = fileName.path
     local data = fileName.data
     local file = fileName.file
+          src  = fileName.source
     if (not name) and path then name = basename(path) end
     if not name then return nil, 'file name require' end
     if data then src = ltn12.source.string(data)
-    elseif file then src = ltn12.source.file(file)
+    elseif file then
+      if io.type(file) then
+        src = ltn12.source.file(file)
+      else
+        src = file
+      end
     elseif path then 
       local fh, err = io.open(path, "rb")
       if not fh then return nil, err end
       src = ltn12.source.file(fh)
-    else return nil, 'need file/path/data' end
+    elseif not src then return nil, 'need file/path/data/source' end
     mime_type   = fileName.mime_type   or mime_type
     disposition = fileName.disposition or disposition
     encode      = fileName.encode      or encode

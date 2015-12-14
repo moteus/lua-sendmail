@@ -61,6 +61,26 @@ ut.corun(sendmail, {
 })
 ```
 
+### Send attached files as single zip archive
+```Lua
+local ZipWriter = require "ZipWriter"
+
+sendmail{
+  ...
+  message = {
+    ...
+    file = {
+      source = ZipWriter.source(ZipWriter.new(), {
+        {"file01.txt", "path/to/file01.txt"},
+        {"file02.txt", "path/to/file02.txt"},
+      }),
+      name = 'files.zip';
+    }
+  }
+}
+```
+
+
 ##Dependences##
 * [LuaSocket](http://www.impa.br/~diego/software/luasocket)
 

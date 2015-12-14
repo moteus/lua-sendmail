@@ -84,7 +84,8 @@ DEFAULT_ENCODE  = 'base64'
 -- @tfield string name attachment's name
 -- @tfield ?string path surce file path
 -- @tfield ?string data content of attachment
--- @tfield ?string file opened file handle (io.open in binary mode)
+-- @tfield ?file file opened file handle (io.open in binary mode)
+-- @tfield ?ltn12.source source source of file content
 -- @tfield ?string charset
 -- @tfield ?string encode
 -- @tfield ?string mime_type Default 'application/octet-stream'
