@@ -1,6 +1,6 @@
 -- sendmail.lua v0.1.4 (2015-10)
 
--- Copyright (c) 2013-2015 Alexey Melnichuk
+-- Copyright (c) 2013-2017 Alexey Melnichuk
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -254,7 +254,7 @@ local function make_from(t)
   return str 
 end
 
-local luasec_create do local ssl = prequire "ssl" if ssl then
+local find_cafile do
 
 -- based on  http://curl.haxx.se/docs/sslcerts.html
 
@@ -305,6 +305,27 @@ local function has(t,k)
   return t == k
 end
 
+find_cafile = function(params)
+  if has(params.verify, "none") then return end
+
+  local cafile, capath = params.cafile, params.capath
+  if cafile or capath then
+    if cafile then cafile = find_ca_by_fs(cafile) or cafile end
+    return cafile, capath
+  end
+
+  cafile, capath = find_ca_by_env()
+  if cafile or capath then return cafile, capath end
+
+  cafile = find_ca_by_fs()
+
+  return cafile
+end
+
+end
+
+local luasec_create do local ssl = prequire "ssl" if ssl then
+
 luasec_create = function(params)
   assert(params)
 
@@ -319,32 +340,21 @@ luasec_create = function(params)
 
   assert(params.mode == "client")
 
-  if not has(params.verify, "none") then repeat
-    if params.cafile or params.capath then
-      if params.cafile then
-        params.cafile = find_ca_by_fs(params.cafile) or params.cafile
-      end
-      break
-    end
-
-    local cafile, capath = find_ca_by_env()
-    if cafile or capath then
-      params.cafile, params.capath = cafile, capath
-      break
-    end
-
-    params.cafile = find_ca_by_fs()
-  until true end
+  local cafile, capath = find_cafile(params)
+  if cafile or capath then
+    params.cafile, params.capath = cafile, capath
+  end
 
   return function()
-
     local sock = socket.tcp()
 
     return setmetatable({
       connect = function(_, host, port)
         local r, e = sock:connect(host, port)
         if not r then return r, e end
-        sock = ssl.wrap(sock, params)
+        r, e = ssl.wrap(sock, params)
+        if not r then return r, e end
+        sock = r
         return sock:dohandshake()
       end
     }, {
@@ -515,7 +525,7 @@ local function CreateMail(from, to, smtp_server, message, options)
   }
 end
 
-local function sendmail(...)
+local function CreateMailEx(...)
   local msg, err;
   if type((...)) == 'table' and select('#', ...) == 1 then
     local params = ...
@@ -524,6 +534,180 @@ local function sendmail(...)
     msg, err = CreateMail(...)
   end
   if not msg then return nil, err end
+  return msg
+end
+
+local sendmail_curl do
+
+local curl_adjust_ltn2_source = function(fn)
+  return function()
+    local chunk, err = fn()
+    if err and not chunk then
+      return nil, err
+    end
+    return chunk
+  end
+end
+
+local function curl_set_verify(curl, c, verify)
+  if type(verify) == 'string' then
+    verify = {verify}
+  end
+
+  local flags = {}
+  for i = 1, #verify do
+    local flag = verify[i]
+    flags [flag] = true
+  end
+
+  if flags.none then
+    c:setopt{
+      ssl_verifyhost = false;
+      ssl_verifypeer = false;
+    }
+  elseif flags.host or flags.peer then
+    c:setopt{
+      ssl_verifyhost = false;
+      ssl_verifypeer = false;
+    }
+    if flags.host then
+      c:setopt_ssl_verifyhost(true)
+    end
+  
+    if flags.peer then
+      c:setopt_ssl_verifypeer(true)
+    end
+  end
+
+  flags.none, flags.host, flags.peer = nil
+
+  local flag = next(flags)
+  if flag then
+    return nil, 'unsupported verify flag: ' .. tostring(flag)
+  end
+
+  return true
+end
+
+local function curl_set_proto(curl, c, protocol)
+  local proto = protocol:sub(1,3):upper() .. protocol:sub(4):lower()
+  proto = curl["SSLVERSION_" .. proto]
+
+  if not proto then
+    return nil, 'unsupportted protocol: ' .. protocol
+  end
+
+  return c:setopt_sslversion(proto)
+end
+
+local function curl_set_ssl(curl, c, ssl)
+  local ok, err
+  if ssl.verify then 
+    ok, err = curl_set_verify(curl, c, ssl.verify)
+    if not ok then return nil, err end
+  end
+
+  ok, err = curl_set_proto(curl, c, ssl.protocol or "TLSv1")
+  if not ok then return nil, err end
+
+  if ssl.ciphers then
+    ok, err = c:setopt_ssl_cipher_list(ssl.ciphers)
+    if not ok then return nil, err end
+  end
+
+  if ssl.key then
+    ok, err = c:setopt_sslkey(ssl.key)
+    if not ok then return nil, err end
+  end
+
+  if ssl.certificate then
+    ok, err = c:setopt_sslcert(ssl.certificate)
+    if not ok then return nil, err end
+  end
+
+  local cafile, capath = find_cafile(ssl)
+
+  if capath then
+    ok, err = c:setopt_capath(capath)
+    if not ok then return nil, err end
+  end
+
+  if cafile then
+    ok, err = c:setopt_cainfo(cafile)
+    if not ok then return nil, err end
+  end
+
+  return true
+end
+
+local curl
+sendmail_curl = function(params, msg)
+  curl = curl or require "cURL.safe"
+  local url, ssl, port
+
+  if params and params.server then
+    ssl = params.server.ssl
+    port = params.server.port
+  end
+
+  if ssl == true then
+    ssl = {
+      protocol = "tlsv1",
+      verify   = {"none"},
+    }
+  end
+
+  url = (ssl and "smtps://" or "smtp://") .. msg.server
+  if port then url = url .. ":" .. tostring(port) end
+
+  local response 
+
+  local c, err, ok = curl.easy{
+    url            = url;
+    mail_from      = msg.from;
+    mail_rcpt      = msg.rcpt;
+    username       = msg.user;
+    password       = msg.password;
+    upload         = true;
+    readfunction   = curl_adjust_ltn2_source(msg.source);
+    headerfunction = function(h)
+      response = h
+    end;
+  }
+  if not c then return nil, e end
+
+  if ssl then
+    ok, err = curl_set_ssl(curl, c, ssl)
+    if not ok then return nil, err end
+  end
+
+  -- if any address e.g. invalid then all operation is fail.
+  ok, err = c:perform()
+  if not ok then
+    c:close()
+    return nil, err
+  end
+
+  ok, err = c:getinfo_response_code()
+
+  c:close()
+
+  return (type(msg.rcpt) == 'table') and #msg.rcpt or 1
+end
+
+end
+
+local function sendmail(...)
+  local msg, err = CreateMailEx(...)
+  if not msg then return nil, err end
+
+  if type((...)) == 'table' and select('#', ...) == 1 then
+    local params = ...
+    if params.engine == 'curl' then
+      return sendmail_curl(params, msg)
+    end
+  end
+
   return smtp.send(msg)
 end
 
