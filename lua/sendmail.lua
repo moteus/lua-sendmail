@@ -329,7 +329,7 @@ local luasec_create do local ssl = prequire "ssl" if ssl then
 luasec_create = function(params)
   assert(params)
 
-  if params == true then params = {} 
+  if params == true then params = {}
   elseif type(params) == 'string' then params = {protocol = params}
   else params = clone(params) end
 
@@ -443,24 +443,6 @@ end end
 --!]]
 local function CreateMail(from, to, smtp_server, message, options)
 
-  local smtp_port = smtp_server.port
-
-  local create_socket = smtp_server.create
-  if smtp_server.ssl then
-    smtp_port = smtp_port or 465
-
-    if not create_socket then
-      if not luasec_create then return nil, "SSL not supported" end
-      local err create_socket, err = luasec_create(smtp_server.ssl)
-      if not create_socket then return nil, err end
-    else
-      local base_create_socket = create_socket
-      create_socket = function()
-        return base_create_socket(smtp_server.ssl)
-      end;
-    end
-  end
-
   options = options or DEFAULT_OPTIONS 
   if type(from)        == 'string' then  from        = { address = from }        end
   if type(to)          == 'string' then  to          = { address = to }          end
@@ -517,24 +499,10 @@ local function CreateMail(from, to, smtp_server, message, options)
     from     = from.address and "<" .. from.address .. ">" or '',
     rcpt     = to,
     server   = smtp_server.address,
-    port     = smtp_port,
     user     = smtp_server.user,
     password = smtp_server.password,
-    create   = create_socket,
     source   = smtp.message(source)
   }
-end
-
-local function CreateMailEx(...)
-  local msg, err;
-  if type((...)) == 'table' and select('#', ...) == 1 then
-    local params = ...
-    msg, err = CreateMail(params.from, params.to, params.server, params.message, params.options)
-  else
-    msg, err = CreateMail(...)
-  end
-  if not msg then return nil, err end
-  return msg
 end
 
 local sendmail_curl do
@@ -650,11 +618,16 @@ sendmail_curl = function(params, msg)
     port = params.server.port
   end
 
-  if ssl == true then
-    ssl = {
-      protocol = "tlsv1",
-      verify   = {"none"},
-    }
+  if ssl then
+    if ssl == true then
+      ssl = {}
+    elseif type(ssl) == 'string' then
+      ssl = {protocol = ssl}
+    else
+      ssl = clone(ssl)
+    end
+    ssl.protocol  = ssl.protocol or "tlsv1"
+    ssl.verify    = ssl.verify   or "peer"
   end
 
   url = (ssl and "smtps://" or "smtp://") .. msg.server
@@ -697,18 +670,56 @@ end
 
 end
 
-local function sendmail(...)
-  local msg, err = CreateMailEx(...)
-  if not msg then return nil, err end
+local sendmail_luasocket do
 
-  if type((...)) == 'table' and select('#', ...) == 1 then
-    local params = ...
-    if params.engine == 'curl' then
-      return sendmail_curl(params, msg)
+sendmail_luasocket = function(msg, smtp_server)
+  if type(smtp_server) == 'table' then
+    local smtp_port = smtp_server.port
+
+    local create_socket = smtp_server.create
+    if smtp_server.ssl then
+      smtp_port = smtp_port or 465
+
+      if not create_socket then
+        if not luasec_create then return nil, "SSL not supported" end
+        local err create_socket, err = luasec_create(smtp_server.ssl)
+        if not create_socket then return nil, err end
+      else
+        local base_create_socket = create_socket
+        create_socket = function()
+          return base_create_socket(smtp_server.ssl)
+        end;
+      end
     end
+
+    msg.port   = smtp_port
+    msg.create = create_socket
   end
 
   return smtp.send(msg)
+end
+
+end
+
+local function sendmail(...)
+  local params, from, to, server, message, options
+
+  if type((...)) == 'table' and select('#', ...) == 1 then
+    params = ...
+    from, to, server, message, options = 
+      params.from, params.to, params.server, params.message, params.options
+  else
+    from, to, server, message, options = ...
+  end
+
+  local msg, err = CreateMail(from, to, server, message, options)
+  if not msg then return nil, err end
+
+  if params and params.engine == 'curl' then
+    return sendmail_curl(params, msg)
+  end
+
+  return sendmail_luasocket(msg, server)
 end
 
 return sendmail
