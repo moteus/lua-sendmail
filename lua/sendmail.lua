@@ -507,7 +507,7 @@ end
 
 local sendmail_curl do
 
-local curl_adjust_ltn2_source = function(fn)
+local curl_adjust_ltn12_source = function(fn)
   return function()
     local chunk, err = fn()
     if err and not chunk then
@@ -642,16 +642,19 @@ sendmail_curl = function(params, msg)
     username       = msg.user;
     password       = msg.password;
     upload         = true;
-    readfunction   = curl_adjust_ltn2_source(msg.source);
+    readfunction   = curl_adjust_ltn12_source(msg.source);
     headerfunction = function(h)
       response = h
     end;
   }
-  if not c then return nil, e end
+  if not c then return nil, err end
 
   if ssl then
     ok, err = curl_set_ssl(curl, c, ssl)
-    if not ok then return nil, err end
+    if not ok then
+      c:close()
+      return nil, err
+    end
   end
 
   -- if any address e.g. invalid then all operation is fail.
@@ -665,7 +668,13 @@ sendmail_curl = function(params, msg)
 
   c:close()
 
-  return (type(msg.rcpt) == 'table') and #msg.rcpt or 1
+  local res = (type(msg.rcpt) == 'table') and #msg.rcpt or 1
+
+  if ok then
+    return  res, ok, response
+  end
+
+  return res, nil, err
 end
 
 end
