@@ -633,9 +633,18 @@ sendmail_curl = function(params, msg)
   url = (ssl and "smtps://" or "smtp://") .. msg.server
   if port then url = url .. ":" .. tostring(port) end
 
-  local response 
+  local async = params.curl and params.curl.async
 
-  local c, err, ok = curl.easy{
+  local c, close_c
+
+  if params.curl and params.curl.handle then
+    c = params.curl.handle
+  else
+    c = curl.easy()
+    close_c = not async
+  end
+
+  local ok, err = c:setopt{
     url            = url;
     mail_from      = msg.from;
     mail_rcpt      = msg.rcpt;
@@ -643,11 +652,8 @@ sendmail_curl = function(params, msg)
     password       = msg.password;
     upload         = true;
     readfunction   = curl_adjust_ltn12_source(msg.source);
-    headerfunction = function(h)
-      response = h
-    end;
   }
-  if not c then return nil, err end
+  if not ok then return nil, err end
 
   if ssl then
     ok, err = curl_set_ssl(curl, c, ssl)
@@ -657,16 +663,25 @@ sendmail_curl = function(params, msg)
     end
   end
 
+  if async then
+    return c, msg
+  end
+
+  local response
+  c:setopt_headerfunction(function(h)
+    response = h
+  end)
+
   -- if any address e.g. invalid then all operation is fail.
   ok, err = c:perform()
   if not ok then
-    c:close()
+    if close_c then c:close() end
     return nil, err
   end
 
   ok, err = c:getinfo_response_code()
 
-  c:close()
+  if close_c then c:close() end
 
   local res = (type(msg.rcpt) == 'table') and #msg.rcpt or 1
 
