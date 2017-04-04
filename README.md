@@ -84,5 +84,6 @@ sendmail{
 
 ## Dependences
 * [LuaSocket](https://luarocks.org/modules/luarocks/luasocket)
-* [Lua-cURL](https://luarocks.org/modules/moteus/lua-curl) - can be used to handle SMTP(S) protocol and IO. Still require LuaSocket to build message itself.
+* [LuaSec](https://luarocks.org/modules/brunoos/luasec) - to support SMTPS protocol
+* [Lua-cURL](https://luarocks.org/modules/moteus/lua-curl) - can be used to handle SMTP(S) protocol and IO. Still require LuaSocket to build message itself
 
