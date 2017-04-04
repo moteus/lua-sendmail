@@ -4,7 +4,8 @@ lua-sendmail
 
 Simple wrapper around luasoket smtp.send.<br/>
 See [documentation](http://moteus.github.io/sendmail/index.html).
-##Usage
+
+## Usage
 
 ```Lua
 local sendmail = require "sendmail"
@@ -81,9 +82,7 @@ sendmail{
 ```
 
 
-##Dependences##
-* [LuaSocket](http://www.impa.br/~diego/software/luasocket)
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/moteus/lua-sendmail/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+## Dependences
+* [LuaSocket](https://luarocks.org/modules/luarocks/luasocket)
+* [Lua-cURL](https://luarocks.org/modules/moteus/lua-curl) - can be used to handle SMTP(S) protocol and IO. Still require LuaSocket to build message itself.
 
