@@ -1,4 +1,4 @@
--- sendmail.lua v0.1.4 (2015-10)
+-- sendmail.lua v0.1.5 (2017-05)
 
 -- Copyright (c) 2013-2017 Alexey Melnichuk
 --
