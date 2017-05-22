@@ -97,11 +97,21 @@ DEFAULT_ENCODE  = 'base64'
 -- @tfield boolean confirm_sending
 -- @table OPTIONS
 
+--- a table describe cURL IO backend
+-- @tfield ?boolean async if set to true then sendmail just init/create cURL easy handle and returns it.
+--                        So it possible use this handle to perform async IO using cURL multi handle.
+--                        User code responsible for close this handle.
+-- @tfield cURL::easy handle pass existing cURL easy handle. sendmail does not close this handle.
+--                        So it possibe reuse same easy handle to send multiple emails.
+-- @table CURL
+
 --- Send mail params as single table.
 -- @tfield string|FROM from
 -- @tfield string|TO to
 -- @tfield string|SERVER server
 -- @tfield string|MESSAGE message
+-- @tfield ?string engine currently supports `curl` and `luasocket`.
+-- @tfield ?CURL curl
 -- @tfield ?OPTIONS options
 -- @table SENDPARAMS
 

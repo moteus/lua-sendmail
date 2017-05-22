@@ -685,6 +685,10 @@ sendmail_curl = function(params, msg)
 
   local res = (type(msg.rcpt) == 'table') and #msg.rcpt or 1
 
+  if response then
+    response = string.match(response, "^%s*(.-)%s*$")
+  end
+
   if ok then
     return  res, ok, response
   end
@@ -741,6 +745,10 @@ local function sendmail(...)
 
   if params and params.engine == 'curl' then
     return sendmail_curl(params, msg)
+  end
+
+  if params and params.engine and params.engine ~= 'luasocket' then
+    return nil, 'unsupported engine: ' .. tostring(params.engine)
   end
 
   return sendmail_luasocket(msg, server)
