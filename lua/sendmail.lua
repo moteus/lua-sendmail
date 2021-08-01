@@ -1,6 +1,6 @@
--- sendmail.lua v0.1.5 (2017-05)
+-- sendmail.lua v0.1.6-dev (2021-07)
 
--- Copyright (c) 2013-2017 Alexey Melnichuk
+-- Copyright (c) 2013-2021 Alexey Melnichuk
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -67,6 +67,10 @@ end
 
 local function clone(t)
   return append({}, t)
+end
+
+local function string_trim(s)
+  return (string.match(s, '^%s*(.-)%s*$'))
 end
 
 local function prequire(name)
@@ -440,6 +444,13 @@ end end
 @param options = {
   confirm_sending = true
 }
+
+@param engine = string (luasocket or curl)
+
+@param curl = {
+  handle = <Lua-cURL Easy>,
+  async  = boolean,
+}
 --!]]
 local function CreateMail(from, to, smtp_server, message, options)
 
@@ -641,7 +652,7 @@ sendmail_curl = function(params, msg)
     c = params.curl.handle
   else
     c = curl.easy()
-    close_c = not async
+    close_c = true
   end
 
   local ok, err = c:setopt{
@@ -653,12 +664,15 @@ sendmail_curl = function(params, msg)
     upload         = true;
     readfunction   = curl_adjust_ltn12_source(msg.source);
   }
-  if not ok then return nil, err end
+  if not ok then
+    if close_c then c:close() end
+    return nil, err
+  end
 
   if ssl then
     ok, err = curl_set_ssl(curl, c, ssl)
     if not ok then
-      c:close()
+      if close_c then c:close() end
       return nil, err
     end
   end
@@ -686,7 +700,7 @@ sendmail_curl = function(params, msg)
   local res = (type(msg.rcpt) == 'table') and #msg.rcpt or 1
 
   if response then
-    response = string.match(response, "^%s*(.-)%s*$")
+    response = string_trim(response)
   end
 
   if ok then
