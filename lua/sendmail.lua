@@ -681,10 +681,12 @@ sendmail_curl = function(params, msg)
     return c, msg
   end
 
-  local response
-  c:setopt_headerfunction(function(h)
-    response = h
-  end)
+  -- local response
+  -- easy:setopt_headerfunction(function(h)
+  --   -- this cath the last response from the server.
+  --   -- in case of forbid_reuse option is set it will be response for the QUIT command
+  --   response = h
+  -- end)
 
   -- if any address e.g. invalid then all operation is fail.
   ok, err = c:perform()
@@ -693,21 +695,20 @@ sendmail_curl = function(params, msg)
     return nil, err
   end
 
-  ok, err = c:getinfo_response_code()
-
+  local status, err = c:getinfo_response_code()
   if close_c then c:close() end
 
-  local res = (type(msg.rcpt) == 'table') and #msg.rcpt or 1
-
-  if response then
-    response = string_trim(response)
+  if not status then
+    return nil, err
   end
 
-  if ok then
-    return  res, ok, response
+  -- not sure that it possible. Seems libcurl raises error in this case
+  -- But just in case.
+  if not (status >= 200 and status < 300) then
+    return nil, string.format('%d Unknown error', status)
   end
-
-  return res, nil, err
+  
+  return (type(msg.rcpt) == 'table') and #msg.rcpt or 1
 end
 
 end
